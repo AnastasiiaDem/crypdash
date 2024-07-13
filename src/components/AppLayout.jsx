@@ -25,7 +25,7 @@ export default function AppLayout() {
   return (
     <Layout style={layoutStyle}>
       <AppHeader />
-      <Layout style={{ padding: "2rem", background: "#161720" }}>
+      <Layout style={{ padding: "2rem 3rem", background: "#161720" }}>
         <AppContent />
         <AppSider />
       </Layout>

@@ -1,29 +1,40 @@
 import React, { useContext } from "react";
 
-import { ArrowDownOutlined, ArrowUpOutlined } from "@ant-design/icons";
-import { Card, Layout, List, Tag } from "antd";
+import {
+  ArrowDownOutlined,
+  ArrowUpOutlined,
+  CloseOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
+import { Card, Flex, Layout, List, Tag } from "antd";
 import CryptoContext from "../context/crypto-context";
 
-const siderStyle = {
-  textAlign: "center",
-  backgroundColor: "#161720",
-};
+import { formatMoney } from "../utils";
 
 export default function AppSider() {
-  const { myCrypto } = useContext(CryptoContext);
+  const { myCrypto, totalWallet } = useContext(CryptoContext);
 
   return (
-    <Layout.Sider width="25%" style={siderStyle}>
+    <Layout.Sider
+      width="25%"
+      className="sider"
+      style={{ background: "#161720" }}
+    >
+      <Flex align="center" justify="space-between" style={{ padding: "1rem" }}>
+        <h3 style={{ color: "#ffffff80" }}>Total Wallet:</h3>
+        <h1>{formatMoney(totalWallet)}</h1>
+      </Flex>
+
       {myCrypto.map((coin) => (
-        <Card key={coin.id} style={{ marginBottom: "1rem" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "0 1rem 2rem",
-            }}
-          >
+        <Card
+          key={coin.id}
+          style={{ marginBottom: "1rem" }}
+          actions={[
+            <EditOutlined key="edit" />,
+            <CloseOutlined key="delete" />,
+          ]}
+        >
+          <div style={{ padding: "0 1rem" }}>
             <div style={{ display: "flex", alignItems: "center" }}>
               <img
                 src={coin.icon}
@@ -33,7 +44,7 @@ export default function AppSider() {
               />
               <h2>{coin.name}</h2>
             </div>
-            <div>
+            <div style={{ padding: "0.5rem 0 1rem" }}>
               <h2
                 style={{
                   color: coin.priceChange ? "#3f8600" : "#cf1322",
@@ -41,7 +52,7 @@ export default function AppSider() {
                 }}
               >
                 {coin.priceChange ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-                {coin.totalAmount.toFixed(2)} $
+                {formatMoney(coin.totalAmount)}
               </h2>
             </div>
           </div>
@@ -49,10 +60,10 @@ export default function AppSider() {
             size="small"
             dataSource={[
               { title: "Amount", value: `${coin.amount} ${coin.symbol}` },
-              { title: "Today's Price", value: coin.price + " $" },
+              { title: "Today's Price", value: formatMoney(coin.price) },
               {
                 title: "Total Profit",
-                value: coin.totalProfit.toFixed(2) + " $",
+                value: formatMoney(coin.totalProfit),
                 withTag: true,
               },
             ]}
@@ -80,6 +91,16 @@ export default function AppSider() {
           />
         </Card>
       ))}
+
+      {/* <Drawer
+        width={600}
+        title="Add Crypto"
+        onClose={() => setDrawer(false)}
+        open={drawer}
+        destroyOnClose
+      >
+        <CryptoForm onClose={() => setDrawer(false)} />
+      </Drawer> */}
     </Layout.Sider>
   );
 }

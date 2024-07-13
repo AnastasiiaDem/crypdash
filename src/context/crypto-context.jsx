@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { fakeFetchAllCrypto, fetchMyCrypto } from "../api";
 import { percentDifference } from "../utils";
 
@@ -6,16 +6,24 @@ const CryptoContext = createContext({
   myCrypto: [],
   allCrypto: [],
   loading: false,
+  totalWallet: 0,
 });
 
 export function CryptoContextProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [allCrypto, setAllCrypto] = useState([]);
   const [myCrypto, setMyCrypto] = useState([]);
+  const [totalWallet, setTotalWallet] = useState(0);
 
   function mapMyCrypto(myCryptoData, result) {
+    let total = 0;
+
     return myCryptoData.map((cryptoItem) => {
       const coin = result.find((c) => c.id === cryptoItem.id);
+
+      total += cryptoItem.amount * coin.price;
+
+      setTotalWallet(total);
 
       return {
         id: coin.id,
@@ -38,11 +46,13 @@ export function CryptoContextProvider({ children }) {
       setLoading(true);
       const { result } = await fakeFetchAllCrypto();
       const myCryptoData = await fetchMyCrypto();
+      const mappedCrypto = mapMyCrypto(myCryptoData, result);
 
-      setMyCrypto(mapMyCrypto(myCryptoData, result));
+      setMyCrypto(mappedCrypto);
       setAllCrypto(result);
       setLoading(false);
     }
+
     preload();
   }, []);
 
@@ -51,14 +61,12 @@ export function CryptoContextProvider({ children }) {
   }
 
   return (
-    <CryptoContext.Provider value={{ loading, allCrypto, myCrypto, addMyCrypto }}>
+    <CryptoContext.Provider
+      value={{ loading, allCrypto, myCrypto, totalWallet, addMyCrypto }}
+    >
       {children}
     </CryptoContext.Provider>
   );
-}
-
-export function useCrypto() {
-  return useContext(CryptoContext);
 }
 
 export default CryptoContext;

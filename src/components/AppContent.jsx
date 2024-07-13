@@ -1,18 +1,21 @@
 import { Layout } from "antd";
+import React, { useContext } from "react";
 
-import { useCrypto } from "../context/crypto-context";
+import CryptoContext from "../context/crypto-context";
 
 const contentStyle = {
-  textAlign: "center",
   minHeight: 120,
   maxWidth: "75%",
-  lineHeight: "120px",
   color: "#fff",
   backgroundColor: "#161720",
 };
 
 export default function AppContent() {
-  const { myCrypto, allCrypto } = useCrypto();
+  const { myCrypto, allCrypto, totalWallet } = useContext(CryptoContext);
 
-  return <Layout.Content style={contentStyle}>Content</Layout.Content>;
+  return (
+    <Layout.Content style={contentStyle}>
+      <h1>Dashboard</h1>
+    </Layout.Content>
+  );
 }

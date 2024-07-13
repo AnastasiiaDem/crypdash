@@ -27,3 +27,19 @@ p, a, h1, h2, h3, h4, h5, h6 {
   margin: 0;
   padding: 0;
 }
+
+.coin-info p {
+  padding-bottom: 0.5rem;
+}
+
+.coin-info p span:nth-child(odd) {
+  font-weight: bold;
+}
+
+.sider .ant-statistic-title {
+  color: #868686;
+}
+
+.sider .ant-statistic-content {
+  color: #fff;
+}

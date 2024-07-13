@@ -1,7 +1,7 @@
 import { Layout } from "antd";
-import React from "react";
+import React, { useContext } from "react";
+import CryptoContext from "../context/crypto-context";
 
-import { useCrypto } from "../context/crypto-context";
 
 const footerStyle = {
   textAlign: "center",
@@ -10,7 +10,7 @@ const footerStyle = {
 };
 
 export default function AppFooter() {
-  const { myCrypto, allCrypto } = useCrypto();
+  const { myCrypto, allCrypto } = useContext(CryptoContext);
 
   return <Layout.Footer style={footerStyle}>Footer</Layout.Footer>;
 }
