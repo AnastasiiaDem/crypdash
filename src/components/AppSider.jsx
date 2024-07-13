@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import React, { useContext } from "react";
 
 import { ArrowDownOutlined, ArrowUpOutlined } from "@ant-design/icons";
-import { Card, Layout, List, Spin, Statistic, Tag, Typography } from "antd";
-
-import { fakeFetchAllCrypto, fetchMyCrypto } from "../api";
-import { percentDifference } from "../utils";
+import { Card, Layout, List, Tag } from "antd";
+import CryptoContext from "../context/crypto-context";
 
 const siderStyle = {
   textAlign: "center",
@@ -12,80 +10,69 @@ const siderStyle = {
 };
 
 export default function AppSider() {
-  const [loading, setLoading] = useState(false);
-  const [allCrypto, setAllCrypto] = useState([]);
-  const [myCrypto, setMyCrypto] = useState([]);
-
-  useEffect(() => {
-    async function preload() {
-      setLoading(true);
-      const { result } = await fakeFetchAllCrypto();
-      const myCryptoData = await fetchMyCrypto();
-
-      const mappedMyCrypto = myCryptoData.map((cryptoItem) => {
-        const coin = result.find((c) => c.id == cryptoItem.id);
-        
-        return {
-          id: coin.id,
-          name: coin.name,
-          grow: cryptoItem.price < coin.price,
-          growPercent: percentDifference(cryptoItem.price, coin.price),
-          totalAmount: cryptoItem.amount * coin.price,
-          totalProfit:
-            cryptoItem.amount * coin.price -
-            cryptoItem.amount * cryptoItem.price,
-          ...cryptoItem,
-        };
-      });
-
-      setMyCrypto(mappedMyCrypto);
-      setAllCrypto(result);
-      setLoading(false);
-    }
-
-    preload();
-  }, []);
-
-  if (loading) {
-    return <Spin fullscreen />
-  }
+  const { myCrypto } = useContext(CryptoContext);
 
   return (
     <Layout.Sider width="25%" style={siderStyle}>
-      {myCrypto.map(coin => (
+      {myCrypto.map((coin) => (
         <Card key={coin.id} style={{ marginBottom: "1rem" }}>
-          <Statistic
-            title={coin.name}
-            value={coin.totalAmount}
-            precision={2}
-            valueStyle={{color: coin.grow ? '#3f8600' : '#cf1322'}}            
-            prefix={coin.grow ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-            suffix="$"
-          />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0 1rem 2rem",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img
+                src={coin.icon}
+                height="30px"
+                width="30px"
+                style={{ marginRight: "1rem" }}
+              />
+              <h2>{coin.name}</h2>
+            </div>
+            <div>
+              <h2
+                style={{
+                  color: coin.priceChange ? "#3f8600" : "#cf1322",
+                  fontWeight: 600,
+                }}
+              >
+                {coin.priceChange ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
+                {coin.totalAmount.toFixed(2)} $
+              </h2>
+            </div>
+          </div>
           <List
             size="small"
             dataSource={[
+              { title: "Amount", value: `${coin.amount} ${coin.symbol}` },
+              { title: "Today's Price", value: coin.price + " $" },
               {
-                title: 'Total Profit',
-                value: coin.totalProfit,
+                title: "Total Profit",
+                value: coin.totalProfit.toFixed(2) + " $",
                 withTag: true,
               },
-              { title: 'Amount', value: coin.amount, isPlain: true }
             ]}
             renderItem={(item) => (
               <List.Item>
                 <span>{item.title}</span>
                 <span>
-                  {item.withTag && (
-                    <Tag color={coin.grow ? 'green' : 'red'}>
-                      {coin.growPercent}%
-                    </Tag>
-                  )}
-                  {item.isPlain && item.value}
-                  {!item.isPlain && (
-                    <Typography.Text type={coin.grow ? 'success' : 'danger'}>
-                      {item.value.toFixed(2)}$
-                    </Typography.Text>
+                  {item.withTag ? (
+                    <div>
+                      <Tag color={coin.priceChange ? "green" : "red"}>
+                        {coin.growPercent}%
+                      </Tag>
+                      <span
+                        style={{ color: coin.priceChange ? "green" : "red" }}
+                      >
+                        {item.value}
+                      </span>
+                    </div>
+                  ) : (
+                    item.value
                   )}
                 </span>
               </List.Item>
