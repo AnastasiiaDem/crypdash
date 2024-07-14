@@ -1,6 +1,6 @@
 import { createContext, useCallback, useEffect, useState } from "react";
 import { fakeFetchAllCrypto, fetchMyCrypto } from "../api";
-import { percentDifference } from "../utils";
+import { percentDifference, precise } from "../utils";
 
 const CryptoContext = createContext({
   myCrypto: [],
@@ -21,7 +21,7 @@ export function CryptoContextProvider({ children }) {
     const mappedCrypto = myCryptoData.map((cryptoItem) => {
       const coin = allCryptoData.find((c) => c.id === cryptoItem.id);
 
-      const totalAmount = cryptoItem.amount * coin.price;
+      const totalAmount = +precise(cryptoItem.amount * coin.price);
       total += totalAmount;
 
       return {
@@ -34,7 +34,7 @@ export function CryptoContextProvider({ children }) {
         priceChange: coin.price > cryptoItem.price,
         growPercent: percentDifference(cryptoItem.price, coin.price),
         totalAmount,
-        totalProfit: totalAmount - cryptoItem.amount * cryptoItem.price,
+        totalProfit: precise(totalAmount - cryptoItem.amount * cryptoItem.price),
       };
     });
 
@@ -60,9 +60,22 @@ export function CryptoContextProvider({ children }) {
     preload();
   }, []);
 
-  const addMyCrypto = (newMyCrypto) => {
-    setMyCrypto((prev) => mapMyCrypto([...prev, newMyCrypto], allCrypto));
-  };
+  function addMyCrypto(newCrypto) {
+    setMyCrypto((prev) => {
+      const existingCrypto = prev.find((crypto) => crypto.id === newCrypto.id);
+      if (existingCrypto) {
+        const updatedCrypto = prev.map((crypto) => {
+          if (crypto.id === newCrypto.id) {
+            const newAmount = crypto.amount + newCrypto.amount;
+            return { ...crypto, amount: newAmount, price: newCrypto.price };
+          }
+          return crypto;
+        });
+        return mapMyCrypto(updatedCrypto, allCrypto);
+      }
+      return mapMyCrypto([...prev, newCrypto], allCrypto);
+    });
+  }
 
   const updateMyCrypto = (updatedCrypto) => {
     setMyCrypto((prev) => {

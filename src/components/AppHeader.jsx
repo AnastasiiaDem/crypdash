@@ -73,6 +73,7 @@ export default function AppHeader() {
         title="Add Crypto"
         onClose={() => setDrawer(false)}
         open={drawer}
+        placement="left"
         destroyOnClose
       >
         <CryptoForm onClose={() => setDrawer(false)} />

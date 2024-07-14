@@ -616,24 +616,20 @@ export const myCrypto = [
     id: 'bitcoin',
     amount: 0.02,
     price: 26244,
-    date: new Date(),
   },
   {
     id: 'ethereum',
     amount: 5,
     price: 2456,
-    date: new Date(),
   },
-  // {
-  //   id: 'dogecoin',
-  //   amount: 200,
-  //   price: 0.079,
-  //   date: new Date(),
-  // },
-  // {
-  //   id: 'polkadot',
-  //   amount: 100,
-  //   price: 6.59,
-  //   date: new Date(),
-  // },
+  {
+    id: 'dogecoin',
+    amount: 200,
+    price: 0.079,
+  },
+  {
+    id: 'polkadot',
+    amount: 100,
+    price: 6.59,
+  },
 ]

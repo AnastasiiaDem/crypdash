@@ -1,6 +1,5 @@
 import {
   Button,
-  DatePicker,
   Divider,
   Flex,
   Form,
@@ -14,6 +13,7 @@ import {
 import { useContext, useEffect, useRef, useState } from "react";
 import CryptoContext from "../context/crypto-context";
 
+import { precise } from "../utils";
 
 const validateMessages = {
   required: "${label} is required!",
@@ -36,8 +36,7 @@ export default function CryptoForm({ onClose, coinProp = null }) {
     if (coinProp) {
       form.setFieldsValue({
         amount: coinProp.amount,
-        price: formatValue(coinProp.price),
-        date: !coinProp.date ? null : coinProp.date?.$d,
+        price: precise(coinProp.price),
         total: coinProp.amount * coinProp.price,
       });
     }
@@ -90,7 +89,6 @@ export default function CryptoForm({ onClose, coinProp = null }) {
       id: coin.id,
       amount: values.amount,
       price: values.price,
-      date: values.date?.$d ?? new Date(),
     };
     myCryptoRef.current = newCrypto;
     setSubmitted(true);
@@ -101,13 +99,6 @@ export default function CryptoForm({ onClose, coinProp = null }) {
     }
   }
 
-  function handleAmountChange(value) {
-    const price = form.getFieldValue("price");
-    form.setFieldsValue({
-      total: +(value * price).toFixed(2),
-    });
-  }
-
   function handlePriceChange(value) {
     const amount = form.getFieldValue("amount");
     form.setFieldsValue({
@@ -115,8 +106,18 @@ export default function CryptoForm({ onClose, coinProp = null }) {
     });
   }
 
-  function formatValue(price) {
-    return price < 1 ? price.toFixed(8) : price.toFixed(2);
+  function handleAmountChange(value) {
+    const price = form.getFieldValue("price");
+    form.setFieldsValue({
+      total: +(value * price).toFixed(2),
+    });
+  }
+
+  function handleTotalChange(value) {
+    const price = form.getFieldValue("price");
+    form.setFieldsValue({
+      amount: +(value / price).toFixed(6),
+    });
   }
 
   return (
@@ -133,9 +134,8 @@ export default function CryptoForm({ onClose, coinProp = null }) {
         maxWidth: 600,
       }}
       initialValues={{
-        price: coinProp ? formatValue(coinProp.price) : formatValue(coin.price),
+        price: coinProp ? precise(coinProp.price) : precise(coin.price),
         amount: coinProp ? coinProp.amount : coin.amount,
-        date: coinProp ? coinProp.date?.$d : coin.data?.$d,
         total: coinProp ? coinProp.amount * coinProp.price : coin.total,
       }}
       onFinish={onFinish}
@@ -175,7 +175,17 @@ export default function CryptoForm({ onClose, coinProp = null }) {
 
       <Form.Item label="Price">
         <Space>
-          <Form.Item name="price" noStyle>
+          <Form.Item
+            name="price"
+            noStyle
+            rules={[
+              {
+                required: true,
+                type: "number",
+                min: 0,
+              },
+            ]}
+          >
             <InputNumber
               onChange={handlePriceChange}
               step={0.1}
@@ -184,18 +194,24 @@ export default function CryptoForm({ onClose, coinProp = null }) {
           </Form.Item>
           <Tooltip title="Today's Price">
             <Tag color="yellow">
-              {formatValue(allCrypto.find((c) => c.id === coin.id).price)}
+              {precise(allCrypto.find((c) => c.id === coin.id).price)}
             </Tag>
           </Tooltip>
         </Space>
       </Form.Item>
 
-      <Form.Item label="Date & Time" name="date">
-        <DatePicker showTime style={{ width: "100%" }} />
-      </Form.Item>
-
-      <Form.Item label="Total" name="total">
-        <InputNumber disabled style={{ width: "100%" }} />
+      <Form.Item
+        label="Total"
+        name="total"
+        rules={[
+          {
+            required: true,
+            type: "number",
+            min: 0,
+          },
+        ]}
+      >
+        <InputNumber style={{ width: "100%" }} onChange={handleTotalChange} />
       </Form.Item>
 
       <Form.Item>
