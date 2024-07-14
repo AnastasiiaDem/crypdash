@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { fakeFetchAllCrypto, fetchMyCrypto } from "../api";
 import { percentDifference } from "../utils";
 
@@ -15,54 +15,85 @@ export function CryptoContextProvider({ children }) {
   const [myCrypto, setMyCrypto] = useState([]);
   const [totalWallet, setTotalWallet] = useState(0);
 
-  function mapMyCrypto(myCryptoData, result) {
+  const mapMyCrypto = useCallback((myCryptoData, allCryptoData) => {
     let total = 0;
 
-    return myCryptoData.map((cryptoItem) => {
-      const coin = result.find((c) => c.id === cryptoItem.id);
+    const mappedCrypto = myCryptoData.map((cryptoItem) => {
+      const coin = allCryptoData.find((c) => c.id === cryptoItem.id);
 
-      total += cryptoItem.amount * coin.price;
-
-      setTotalWallet(total);
+      const totalAmount = cryptoItem.amount * coin.price;
+      total += totalAmount;
 
       return {
+        ...cryptoItem,
         id: coin.id,
         name: coin.name,
         symbol: coin.symbol,
         icon: coin.icon,
-        price: coin.price,
+        price: cryptoItem.price,
         priceChange: coin.price > cryptoItem.price,
         growPercent: percentDifference(cryptoItem.price, coin.price),
-        totalAmount: cryptoItem.amount * coin.price,
-        totalProfit:
-          cryptoItem.amount * coin.price - cryptoItem.amount * cryptoItem.price,
-        ...cryptoItem,
+        totalAmount,
+        totalProfit: totalAmount - cryptoItem.amount * cryptoItem.price,
       };
     });
-  }
+
+    setTotalWallet(total);
+    return mappedCrypto;
+  }, []);
 
   useEffect(() => {
     async function preload() {
       setLoading(true);
-      const { result } = await fakeFetchAllCrypto();
-      const myCryptoData = await fetchMyCrypto();
-      const mappedCrypto = mapMyCrypto(myCryptoData, result);
+      try {
+        const { result } = await fakeFetchAllCrypto();
+        const myCryptoData = await fetchMyCrypto();
+        const mappedCrypto = mapMyCrypto(myCryptoData, result);
 
-      setMyCrypto(mappedCrypto);
-      setAllCrypto(result);
-      setLoading(false);
+        setMyCrypto(mappedCrypto);
+        setAllCrypto(result);
+      } finally {
+        setLoading(false);
+      }
     }
 
     preload();
   }, []);
 
-  function addMyCrypto(newMyCrypto) {
+  const addMyCrypto = (newMyCrypto) => {
     setMyCrypto((prev) => mapMyCrypto([...prev, newMyCrypto], allCrypto));
-  }
+  };
+
+  const updateMyCrypto = (updatedCrypto) => {
+    setMyCrypto((prev) => {
+      const updatedList = prev.map((cryptoItem) =>
+        cryptoItem.id === updatedCrypto.id
+          ? { ...cryptoItem, ...updatedCrypto }
+          : cryptoItem
+      );
+      return mapMyCrypto(updatedList, allCrypto);
+    });
+  };
+
+  const deleteMyCrypto = (cryptoId) => {
+    setMyCrypto((prev) => {
+      const filteredList = prev.filter((cryptoItem) => cryptoItem.id !== cryptoId);
+      console.log(filteredList)
+      return mapMyCrypto(filteredList, allCrypto);
+    });
+  };
 
   return (
     <CryptoContext.Provider
-      value={{ loading, allCrypto, myCrypto, totalWallet, addMyCrypto }}
+      value={{
+        loading,
+        allCrypto,
+        myCrypto,
+        totalWallet,
+        addMyCrypto,
+        updateMyCrypto,
+        deleteMyCrypto
+      }}
     >
       {children}
     </CryptoContext.Provider>

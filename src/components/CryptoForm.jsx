@@ -8,25 +8,40 @@ import {
   Result,
   Select,
   Space,
+  Tag,
+  Tooltip,
 } from "antd";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import CryptoContext from "../context/crypto-context";
+
 
 const validateMessages = {
   required: "${label} is required!",
   types: {
-    number: "${label} in not valid number",
+    number: "${label} is not a valid number",
   },
 };
 
-export default function CryptoForm({ onClose }) {
+export default function CryptoForm({ onClose, coinProp = null }) {
   const [form] = Form.useForm();
 
-  const { myCrypto, allCrypto, addMyCrypto } = useContext(CryptoContext);
+  const { myCrypto, allCrypto, addMyCrypto, updateMyCrypto } =
+    useContext(CryptoContext);
 
-  const [coin, setCoin] = useState(null);
+  const [coin, setCoin] = useState(coinProp);
   const [submitted, setSubmitted] = useState(false);
   const myCryptoRef = useRef();
+
+  useEffect(() => {
+    if (coinProp) {
+      form.setFieldsValue({
+        amount: coinProp.amount,
+        price: formatValue(coinProp.price),
+        date: !coinProp.date ? null : coinProp.date?.$d,
+        total: coinProp.amount * coinProp.price,
+      });
+    }
+  }, [coinProp, form]);
 
   if (submitted) {
     return (
@@ -37,7 +52,7 @@ export default function CryptoForm({ onClose }) {
         extra={[
           <Button type="primary" key="console" onClick={onClose}>
             Close
-          </Button>
+          </Button>,
         ]}
       />
     );
@@ -79,7 +94,11 @@ export default function CryptoForm({ onClose }) {
     };
     myCryptoRef.current = newCrypto;
     setSubmitted(true);
-    addMyCrypto(newCrypto);
+    if (!coinProp) {
+      addMyCrypto(newCrypto);
+    } else {
+      updateMyCrypto(newCrypto);
+    }
   }
 
   function handleAmountChange(value) {
@@ -96,6 +115,10 @@ export default function CryptoForm({ onClose }) {
     });
   }
 
+  function formatValue(price) {
+    return price < 1 ? price.toFixed(8) : price.toFixed(2);
+  }
+
   return (
     <Form
       form={form}
@@ -110,9 +133,10 @@ export default function CryptoForm({ onClose }) {
         maxWidth: 600,
       }}
       initialValues={{
-        price: +(coin.price < 1
-          ? coin.price.toFixed(8)
-          : coin.price.toFixed(2)),
+        price: coinProp ? formatValue(coinProp.price) : formatValue(coin.price),
+        amount: coinProp ? coinProp.amount : coin.amount,
+        date: coinProp ? coinProp.date?.$d : coin.data?.$d,
+        total: coinProp ? coinProp.amount * coinProp.price : coin.total,
       }}
       onFinish={onFinish}
       validateMessages={validateMessages}
@@ -149,16 +173,25 @@ export default function CryptoForm({ onClose }) {
         />
       </Form.Item>
 
-      <Form.Item label="Price" name="price">
-        <InputNumber
-          onChange={handlePriceChange}
-          step={0.1}
-          style={{ width: "100%" }}
-        />
+      <Form.Item label="Price">
+        <Space>
+          <Form.Item name="price" noStyle>
+            <InputNumber
+              onChange={handlePriceChange}
+              step={0.1}
+              style={{ width: "100%" }}
+            />
+          </Form.Item>
+          <Tooltip title="Today's Price">
+            <Tag color="yellow">
+              {formatValue(allCrypto.find((c) => c.id === coin.id).price)}
+            </Tag>
+          </Tooltip>
+        </Space>
       </Form.Item>
 
       <Form.Item label="Date & Time" name="date">
-        <DatePicker showTime />
+        <DatePicker showTime style={{ width: "100%" }} />
       </Form.Item>
 
       <Form.Item label="Total" name="total">

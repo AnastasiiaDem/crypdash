@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import {
   ArrowDownOutlined,
@@ -6,13 +6,18 @@ import {
   CloseOutlined,
   EditOutlined,
 } from "@ant-design/icons";
-import { Card, Flex, Layout, List, Tag } from "antd";
+import { Card, Drawer, Flex, Layout, List, Modal, Tag } from "antd";
 import CryptoContext from "../context/crypto-context";
 
 import { formatMoney } from "../utils";
+import CryptoForm from "./CryptoForm";
 
 export default function AppSider() {
-  const { myCrypto, totalWallet } = useContext(CryptoContext);
+  const { allCrypto, myCrypto, totalWallet, deleteMyCrypto } = useContext(CryptoContext);
+
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [myCoin, setMyCoin] = useState(null);
 
   return (
     <Layout.Sider
@@ -25,45 +30,52 @@ export default function AppSider() {
         <h1>{formatMoney(totalWallet)}</h1>
       </Flex>
 
-      {myCrypto.map((coin) => (
+      {myCrypto.map((myCoin) => (
         <Card
-          key={coin.id}
+          key={myCoin.id}
           style={{ marginBottom: "1rem" }}
           actions={[
-            <EditOutlined key="edit" />,
-            <CloseOutlined key="delete" />,
+            <EditOutlined key="edit" onClick={() => {
+              setShowDrawer(true);
+              setMyCoin(myCoin);
+            }} />,
+            <CloseOutlined key="delete" onClick={() => {
+              setShowConfirm(true);
+              setMyCoin(myCoin);
+            }} />,
           ]}
         >
           <div style={{ padding: "0 1rem" }}>
             <div style={{ display: "flex", alignItems: "center" }}>
               <img
-                src={coin.icon}
+                src={myCoin.icon}
                 height="30px"
                 width="30px"
                 style={{ marginRight: "1rem" }}
               />
-              <h2>{coin.name}</h2>
+              <h2>{myCoin.name}</h2>
             </div>
             <div style={{ padding: "0.5rem 0 1rem" }}>
               <h2
                 style={{
-                  color: coin.priceChange ? "#3f8600" : "#cf1322",
+                  color: myCoin.priceChange ? "#3f8600" : "#cf1322",
                   fontWeight: 600,
                 }}
               >
-                {coin.priceChange ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-                {formatMoney(coin.totalAmount)}
+                {myCoin.priceChange ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
+                {formatMoney(myCoin.totalAmount)}
               </h2>
             </div>
           </div>
           <List
             size="small"
             dataSource={[
-              { title: "Amount", value: `${coin.amount} ${coin.symbol}` },
-              { title: "Today's Price", value: formatMoney(coin.price) },
+              { title: "Amount", value: `${myCoin.amount} ${myCoin.symbol}` },
+              { title: "Purchase Price", value: formatMoney(myCoin.price) },
+              { title: "Today's Price", value: formatMoney(allCrypto.find(c => c.id === myCoin.id)?.price) },
               {
                 title: "Total Profit",
-                value: formatMoney(coin.totalProfit),
+                value: formatMoney(myCoin.totalProfit),
                 withTag: true,
               },
             ]}
@@ -73,11 +85,11 @@ export default function AppSider() {
                 <span>
                   {item.withTag ? (
                     <div>
-                      <Tag color={coin.priceChange ? "green" : "red"}>
-                        {coin.growPercent}%
+                      <Tag color={myCoin.priceChange ? "green" : "red"}>
+                        {myCoin.growPercent}%
                       </Tag>
                       <span
-                        style={{ color: coin.priceChange ? "green" : "red" }}
+                        style={{ color: myCoin.priceChange ? "green" : "red" }}
                       >
                         {item.value}
                       </span>
@@ -92,15 +104,25 @@ export default function AppSider() {
         </Card>
       ))}
 
-      {/* <Drawer
+      <Modal
+        title="Do you want to delete this crypto?"
+        open={showConfirm}
+        okText="Yes"
+        onOk={() => {
+          deleteMyCrypto(myCoin.id);
+          setShowConfirm(false);
+        }}
+        onCancel={() => setShowConfirm(false)}
+        onClose={() => setShowConfirm(false)}/>
+
+      <Drawer
         width={600}
-        title="Add Crypto"
-        onClose={() => setDrawer(false)}
-        open={drawer}
-        destroyOnClose
-      >
-        <CryptoForm onClose={() => setDrawer(false)} />
-      </Drawer> */}
+        title="Edit Crypto"
+        onClose={() => setShowDrawer(false)}
+        open={showDrawer}
+        destroyOnClose>
+        <CryptoForm onClose={() => setShowDrawer(false)} coinProp={myCoin}/>
+      </Drawer>
     </Layout.Sider>
   );
 }
