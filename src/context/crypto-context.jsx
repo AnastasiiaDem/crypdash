@@ -21,7 +21,7 @@ export function CryptoContextProvider({ children }) {
     const mappedCrypto = myCryptoData.map((cryptoItem) => {
       const coin = allCryptoData.find((c) => c.id === cryptoItem.id);
 
-      const totalAmount = +precise(cryptoItem.amount * coin.price);
+      const totalAmount = precise(cryptoItem.amount * coin.price);
       total += totalAmount;
 
       return {
@@ -64,13 +64,15 @@ export function CryptoContextProvider({ children }) {
     setMyCrypto((prev) => {
       const existingCrypto = prev.find((crypto) => crypto.id === newCrypto.id);
       if (existingCrypto) {
-        const updatedCrypto = prev.map((crypto) => {
-          if (crypto.id === newCrypto.id) {
-            const newAmount = crypto.amount + newCrypto.amount;
-            return { ...crypto, amount: newAmount, price: newCrypto.price };
-          }
-          return crypto;
-        });
+        const updatedCrypto = prev.map((crypto) => 
+          crypto.id === newCrypto.id
+            ? { 
+                ...crypto, 
+                amount: crypto.amount + newCrypto.amount, 
+                price: newCrypto.price 
+              }
+            : crypto
+        );
         return mapMyCrypto(updatedCrypto, allCrypto);
       }
       return mapMyCrypto([...prev, newCrypto], allCrypto);
@@ -91,7 +93,6 @@ export function CryptoContextProvider({ children }) {
   const deleteMyCrypto = (cryptoId) => {
     setMyCrypto((prev) => {
       const filteredList = prev.filter((cryptoItem) => cryptoItem.id !== cryptoId);
-      console.log(filteredList)
       return mapMyCrypto(filteredList, allCrypto);
     });
   };

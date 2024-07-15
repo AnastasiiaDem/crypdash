@@ -35,5 +35,5 @@ export function formatMoney(value) {
 }
 
 export function precise(value) {
-  return (+value).toFixed(value < 1 ? 8 : 2);
+  return +((+value).toFixed(value < 1 ? 8 : 2));
 }

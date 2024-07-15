@@ -2,6 +2,7 @@ import { Layout } from "antd";
 import React, { useContext } from "react";
 
 import CryptoContext from "../context/crypto-context";
+import Chart from "./Chart";
 
 const contentStyle = {
   minHeight: 120,
@@ -16,6 +17,7 @@ export default function AppContent() {
   return (
     <Layout.Content style={contentStyle}>
       <h1>Dashboard</h1>
+      <Chart />
     </Layout.Content>
   );
 }

@@ -21,16 +21,16 @@ const labelStyle = {
 };
 
 export default function AppHeader() {
-  const { myCrypto, allCrypto } = useContext(CryptoContext);
+  const { allCrypto } = useContext(CryptoContext);
 
-  const [select, setSelect] = useState(false)
-  const [coin, setCoin] = useState(null)
-  const [modal, setModal] = useState(false)
-  const [drawer, setDrawer] = useState(false)
+  const [coin, setCoin] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
   function handleSelect(value) {
-    setCoin(allCrypto.find((c) => c.id === value))
-    setModal(true)
+    const selectedCoin = allCrypto.find((c) => c.id === value);
+    setCoin(selectedCoin);
+    setModalVisible(true);
   }
 
   return (
@@ -42,9 +42,7 @@ export default function AppHeader() {
         optionFilterProp="label"
         onSelect={handleSelect}
         filterSort={(optionA, optionB) =>
-          (optionA?.label ?? "")
-            .toLowerCase()
-            .localeCompare((optionB?.label ?? "").toLowerCase())
+          (optionA.label ?? "").toLowerCase().localeCompare((optionB.label ?? "").toLowerCase())
         }
         options={allCrypto.map((coin) => ({
           label: coin.name,
@@ -53,30 +51,26 @@ export default function AppHeader() {
         }))}
         optionRender={(option) => (
           <div style={labelStyle}>
-            <img
-              style={{ width: 20 }}
-              src={option.data.icon}
-              alt={option.data.label}
-            />{' '}
-            {option.data.label}
+            <img style={{ width: 20 }} src={option.icon} alt={option.label} />
+            {option.label}
           </div>
         )}
       />
-      <Button type="primary" onClick={() => setDrawer(true)}>Add Crypto</Button>
+      <Button type="primary" onClick={() => setDrawerVisible(true)}>Add Crypto</Button>
 
-      <Modal open={modal} onCancel={() => setModal(false)} footer={false}>
+      <Modal open={modalVisible} onCancel={() => setModalVisible(false)} footer={null}>
         <CoinInfoModal coin={coin} />
       </Modal>
 
       <Drawer
         width={600}
         title="Add Crypto"
-        onClose={() => setDrawer(false)}
-        open={drawer}
+        onClose={() => setDrawerVisible(false)}
+        open={drawerVisible}
         placement="left"
         destroyOnClose
       >
-        <CryptoForm onClose={() => setDrawer(false)} />
+        <CryptoForm onClose={() => setDrawerVisible(false)} />
       </Drawer>
     </Layout.Header>
   );
