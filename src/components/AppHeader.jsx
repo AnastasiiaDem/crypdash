@@ -51,8 +51,8 @@ export default function AppHeader() {
         }))}
         optionRender={(option) => (
           <div style={labelStyle}>
-            <img style={{ width: 20 }} src={option.icon} alt={option.label} />
-            {option.label}
+            <img style={{ width: 20 }} src={option.data.icon} alt={option.data.label} />
+            {option.data.label}
           </div>
         )}
       />

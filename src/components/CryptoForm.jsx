@@ -60,7 +60,6 @@ export default function CryptoForm({ onClose, coinProp = null }) {
         style={{ width: "100%" }}
         onSelect={(v) => setCoin(allCrypto.find((c) => c.id === v))}
         placeholder="Select coin"
-        defaultOpen
         options={allCrypto.map((coin) => ({
           label: coin.name,
           value: coin.id,

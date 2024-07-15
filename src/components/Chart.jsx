@@ -8,23 +8,55 @@ export default function Chart() {
 
   const mappedData = myCrypto.map((crypto) => {
     return {
-        id: crypto.id, 
-        value: crypto.totalAmount,
-        label: crypto.name
-    }
-});
+      id: crypto.id,
+      value: crypto.totalAmount,
+      label: crypto.name,
+    };
+  });
 
   return (
     <PieChart
+      colors={[
+        "#E84142",
+        "#FF6700",
+        "#ede20e",
+        "#003049",
+        "#803DE1",
+        "#62C4FC",
+        "#EAE2B7",
+        "#E6007A",
+        "#a5be00",
+        "#5b2333",
+        "#fcff6c",
+        "#ddc2ff",
+        "#d3d4d9",
+        "#FF5733",
+        "#FFC300",
+        "#FFDC00",
+        "#00A8CC",
+        "#9B5DE5",
+        "#FF3E4D",
+        "#00B4D8",
+        "#FF6F61",
+        "#FFD700",
+        "#FF851B",
+        "#01796F",
+        "#C77DFF",
+        "#FF1493",
+        "#7FFFD4",
+        "#4B0082",
+        "#FFD700",
+        "#32CD32",
+      ]}
       series={[
         {
           arcLabel: (item) => `${item.label}`,
-          arcLabelMinAngle: 45,
+          arcLabelMinAngle: 25,
           data: mappedData,
           innerRadius: 10,
-          outerRadius: 200,
+          outerRadius: 150,
           paddingAngle: 5,
-          cornerRadius: 15,
+          cornerRadius: 10,
           startAngle: -180,
           endAngle: 180,
           cx: "50%",
