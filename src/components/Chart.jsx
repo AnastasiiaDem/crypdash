@@ -71,6 +71,10 @@ export default function Chart() {
       height={400}
       slotProps={{
         legend: { hidden: true },
+        noDataOverlay: {
+          message: "No crypto to display",
+          sx: { fill: "white" },
+        },
       }}
     />
   );

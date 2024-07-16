@@ -612,19 +612,19 @@ export const cryptoData = {
 }
 
 export const myCrypto = [
-  {
-    id: 'bitcoin',
-    amount: 0.02,
-    price: 26244,
-  },
-  {
-    id: 'ethereum',
-    amount: 5,
-    price: 2456,
-  },
-  {
-    id: 'polkadot',
-    amount: 100,
-    price: 6.59,
-  },
+  // {
+  //   id: 'bitcoin',
+  //   amount: 0.02,
+  //   price: 26244,
+  // },
+  // {
+  //   id: 'ethereum',
+  //   amount: 5,
+  //   price: 2456,
+  // },
+  // {
+  //   id: 'polkadot',
+  //   amount: 100,
+  //   price: 6.59,
+  // },
 ]

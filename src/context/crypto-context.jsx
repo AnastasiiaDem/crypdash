@@ -1,5 +1,5 @@
 import { createContext, useCallback, useEffect, useState } from "react";
-import { fakeFetchAllCrypto, fetchMyCrypto } from "../api";
+import { fetchAllCrypto, fetchMyCrypto } from "../api";
 import { percentDifference, precise } from "../utils";
 
 const CryptoContext = createContext({
@@ -46,7 +46,7 @@ export function CryptoContextProvider({ children }) {
     async function preload() {
       setLoading(true);
       try {
-        const { result } = await fakeFetchAllCrypto();
+        const { result } = await fetchAllCrypto();
         const myCryptoData = await fetchMyCrypto();
         const mappedCrypto = mapMyCrypto(myCryptoData, result);
 
