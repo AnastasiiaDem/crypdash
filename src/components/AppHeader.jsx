@@ -5,19 +5,28 @@ import CoinInfoModal from "./CoinInfoModal";
 import CryptoForm from "./CryptoForm";
 
 const headerStyle = {
-  display: 'flex',
+  display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
   color: "#fff",
-  height: 'auto',
+  height: "auto",
   backgroundColor: "#292A33",
-  padding: "2rem 3rem"
+  padding: "2rem 3rem",
+  position: "relative",
 };
 
 const labelStyle = {
-  display: 'flex',
+  display: "flex",
   alignItems: "center",
-  gap: '1rem'
+  gap: "1rem",
+};
+
+const logoStyle = {
+  position: "absolute",
+  left: "50%",
+  top: "50%",
+  transform: "translate(-50%, -50%)",
+  textTransform: "uppercase",
 };
 
 export default function AppHeader() {
@@ -42,7 +51,9 @@ export default function AppHeader() {
         optionFilterProp="label"
         onSelect={handleSelect}
         filterSort={(optionA, optionB) =>
-          (optionA.label ?? "").toLowerCase().localeCompare((optionB.label ?? "").toLowerCase())
+          (optionA.label ?? "")
+            .toLowerCase()
+            .localeCompare((optionB.label ?? "").toLowerCase())
         }
         options={allCrypto.map((coin) => ({
           label: coin.name,
@@ -51,14 +62,25 @@ export default function AppHeader() {
         }))}
         optionRender={(option) => (
           <div style={labelStyle}>
-            <img style={{ width: 20 }} src={option.data.icon} alt={option.data.label} />
+            <img
+              style={{ width: 20 }}
+              src={option.data.icon}
+              alt={option.data.label}
+            />
             {option.data.label}
           </div>
         )}
       />
-      <Button type="primary" onClick={() => setDrawerVisible(true)}>Add Crypto</Button>
+      
+      <Button type="primary" onClick={() => setDrawerVisible(true)}>
+        Add Crypto
+      </Button>
 
-      <Modal open={modalVisible} onCancel={() => setModalVisible(false)} footer={null}>
+      <Modal
+        open={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={null}
+      >
         <CoinInfoModal coin={coin} />
       </Modal>
 

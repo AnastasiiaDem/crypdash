@@ -1,8 +1,24 @@
-# React + Vite
+### <span style="font-size: larger;">CRYPDASH</span>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+#### Overview:
+CRYPDASH &mdash; Crypto Tracker is a cryptocurrency tracking application designed to help users monitor and manage their crypto investments effectively. With features such as real-time price updates, portfolio management, and detailed crypto information, CRYPDASH helps users in staying informed and making data-driven decisions.
 
-Currently, two official plugins are available:
+#### Key Features:
+- Explore all available cryptocurrencies
+- Add new cryptocurrencies to your portfolio
+- View cards of your cryptocurrencies with edit/delete actions
+- Pie chart displaying money distribution across cryptocurrencies
+- Detailed table listing all cryptocurrencies
+- Real-time data updates
+- Search and filter functionality
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+#### Technologies Used:
+- React
+- JavaScript
+- CoinStats API
+- CSS
+- Mui
+- Ant Design
+
+#### How to Access:
+Visit [crypdash.vercel.app](https://crypdash.vercel.app) to start managing your crypto.
