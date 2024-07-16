@@ -30,7 +30,7 @@ export function formatMoney(value) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    maximumFractionDigits: value < 1 ? 8 : 2,
+    maximumFractionDigits: (value < 1 && value > -1) ? 8 : 2,
   }).format(+value);
 }
 
